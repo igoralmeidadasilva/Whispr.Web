@@ -1,0 +1,14 @@
+@if(isShow()) {
+    <div [id]="id()"
+         [class]="buildCssClass()"
+         role="alert">
+
+        @if (isDismissable())
+        {
+            <button type="button" class="btn-close" aria-label="Close" (click)="hide()"></button>
+        }
+
+        <ng-content />
+
+    </div>
+}

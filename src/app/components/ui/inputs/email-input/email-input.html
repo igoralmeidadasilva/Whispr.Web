@@ -1,0 +1,26 @@
+<div [class]="wrapperClass()" [formGroup]="this.formGroupDirective.form">
+    <input type="email"
+           [id]="id()"
+           [formControlName]="controlName()"
+           [class]="inputClass()"
+           placeholder=" " 
+           list="email-suggestions"
+           [class.is-invalid]="control()?.invalid && control()?.touched" />
+
+    <datalist id="email-suggestions">
+        @for(item of _emailSuggestions; track item) {
+            <option [value]="item"></option>
+        }
+    </datalist>
+
+    <label [for]="id()">
+        {{ label() }}
+        @if(this.isRequired()){
+            <span class="text-danger">*</span>
+        }
+    </label>
+
+    @if(!this.hideErrors()) {
+        <app-form-error label="Nome do usuário" [control]="this.control()" [errorsMap]="this.errorsMap()" />
+    }
+</div>

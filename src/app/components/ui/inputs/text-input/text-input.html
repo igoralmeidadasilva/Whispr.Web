@@ -1,0 +1,19 @@
+<div [class]="wrapperClass()" [formGroup]="this.formGroupDirective.form">
+    <input type="text"
+           [id]="id()"
+           [formControlName]="controlName()"
+           [class]="inputClass()"
+           placeholder=" " 
+           [class.is-invalid]="control()?.invalid && control()?.touched" />
+
+    <label [for]="id()">
+        {{ label() }}
+        @if(this.isRequired()){
+            <span class="text-danger">*</span>
+        }
+    </label>
+
+    @if(!this.hideErrors()) {
+        <app-form-error label="Nome do usuário" [control]="this.control()" [errorsMap]="this.errorsMap()" />
+    }
+</div>
