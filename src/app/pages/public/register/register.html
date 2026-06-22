@@ -1,0 +1,28 @@
+<app-card-container title="Criar Conta">
+    <form [formGroup]="registerForm" (ngSubmit)="handleOnSubmit()" novalidate>
+        <app-text-input wrapperCssClass="mb-3" label="Nome" [control]="this.userName" controlName="userName" [errorsMap]="this.userNameErrors" [isRequired]="true"/>
+        <app-email-input wrapperCssClass="mb-3" label="Email" [control]="this.email" controlName="email" [errorsMap]="this.emailErrors" [isRequired]="true" />
+        <app-password-input wrapperCssClass="mb-3" label="Senha" [control]="this.password" controlName="password" [errorsMap]="this.passwordErrors" [isRequired]="true" />
+        <app-password-input wrapperCssClass="mb-3"
+                            label="Confirmar Senha"
+                            [control]="this.confirmPassword"
+                            controlName="confirmPassword" 
+                            [errorsMap]="this.confirmPasswordErrors"
+                            [isRequired]="true" />
+
+        <div class="d-flex justify-content-between gap-3">
+            <app-button [type]="this.buttonTypes.Reset" [color]="this.colors.Secondary" cssClass="w-100" (onClick)="handleOnReset()">Limpar</app-button>
+            <app-button [type]="this.buttonTypes.Submit" cssClass="w-100" [loading]="this.isLoading()">Enviar</app-button>
+        </div>
+
+        <app-problem-alert #alert cssClass="mt-3" />
+
+        <p class="text-center small text-muted mt-3 mb-0">
+            Já tem uma conta?
+            <a href="{{ this.appRoutes.Login }}" class="text-primary text-decoration-none fw-medium link-underline-opacity-0 link-underline-opacity-75-hover">
+                Faça Login
+            </a>
+        </p>
+
+    </form>
+</app-card-container>
