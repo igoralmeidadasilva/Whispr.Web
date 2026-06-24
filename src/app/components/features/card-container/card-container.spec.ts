@@ -13,7 +13,10 @@ describe('CardContainer', () => {
 
     fixture = TestBed.createComponent(CardContainer);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+
+    fixture.componentRef.setInput('title', 'Test Title');
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {
