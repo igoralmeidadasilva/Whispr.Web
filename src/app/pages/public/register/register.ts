@@ -13,6 +13,7 @@ import { UserService } from '../../../core/services/api/v1/users/user.service';
 import { ProblemAlert } from "../../../components/features/problem-alert/problem-alert";
 import { ProblemDetails } from '../../../core/http/problem-details';
 import { EmailInput } from "../../../components/ui/inputs/email-input/email-input";
+import { CreateUserRequest } from '../../../core/models/user.model';
 
 interface RegisterForm {
   userName: FormControl<string | null>;
