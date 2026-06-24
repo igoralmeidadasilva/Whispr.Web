@@ -1,0 +1,31 @@
+<app-card-container title="Entrar">
+    <form [formGroup]="loginForm" (ngSubmit)="handleOnSubmit()" novalidate>
+
+        <app-email-input wrapperCssClass="mb-3" label="Email" [control]="this.email" controlName="email" [errorsMap]="this.emailErrors" [isRequired]="true" />
+
+        <div class="mb-3">
+            <div class="d-flex justify-content-end align-items-center">
+                <a href="{{ this.appRoutes.ForgotPassword }}" class="small text-primary text-decoration-none link-underline-opacity-0 link-underline-opacity-75-hover">
+                    Esqueceu a senha?
+                </a>
+            </div>
+            <app-password-input wrapperCssClass="mb-3" label="Senha" [control]="this.password" controlName="password" [errorsMap]="this.passwordErrors" [isRequired]="true" />
+        </div>
+
+        <app-button [type]="this.buttonTypes.Submit" [color]="this.colors.Primary" cssClass="w-100 mb-2" [loading]="this.isLoading()">
+            Entrar
+        </app-button>
+    </form>
+
+    <app-problem-alert #alert cssClass="mt-3" />
+
+     <hr class="my-3 text-muted" />
+
+    <p class="text-center small text-muted mt-3 mb-0">
+        Não tem uma conta?
+        <a href="{{ this.appRoutes.Register }}" class="text-primary text-decoration-none fw-medium link-underline-opacity-0 link-underline-opacity-75-hover">
+            Criar conta
+        </a>
+    </p>
+
+</app-card-container>
