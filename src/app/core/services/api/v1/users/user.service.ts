@@ -8,10 +8,10 @@ import { CreateUserRequest } from '../../../../models/user.model';
 })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = import.meta.env['NG_APP_API_URL'];
+  private apiUrl = `${import.meta.env['NG_APP_API_URL']}/api/v1/users`;
 
   create(request: CreateUserRequest): Observable<any> {
-    const url = `${this.apiUrl}/api/v1/users`;
+    const url = `${this.apiUrl}`;
     const response = this.http.post(url, request);
     return response;
   }

@@ -1,7 +1,6 @@
 import { Component, inject, signal, viewChild } from '@angular/core';
 import { CardContainer } from "../../../components/features/card-container/card-container";
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UserService } from '../../../core/services/api/v1/users/user.service';
 import { Constraints } from '../../../core/constants/constraints';
 import { PasswordInput } from "../../../components/ui/inputs/password-input/password-input";
 import { AppRoutes } from '../../../core/constants/app-routes';
@@ -10,6 +9,8 @@ import { ButtonTypes } from '../../../components/ui/buttons/button/button.type';
 import { Colors } from '../../../core/enums/colors';
 import { ProblemAlert } from "../../../components/features/problem-alert/problem-alert";
 import { EmailInput } from "../../../components/ui/inputs/email-input/email-input";
+import { LoginRequest } from '../../../core/models/auth.model';
+import { AuthService } from '../../../core/services/api/v1/authentications/auth.service';
 
 interface LoginForm {
   email: FormControl<string | null>;
@@ -35,7 +36,7 @@ const passwordErrors: ReadonlyMap<string, string> = new Map([
 })
 export class Login {
   private formBuilder = inject(FormBuilder);
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
 
   private readonly alert = viewChild.required<ProblemAlert>('alert');
 
@@ -59,8 +60,21 @@ export class Login {
       return;
     }
 
-    // TODO: implementate login loigic here
+    this.isLoading.set(true);
 
+    const request: LoginRequest = {
+      email: this.email?.value ?? '',
+      password: this.password?.value ?? ''
+    };
+
+    this.authService.login(request).subscribe({
+      next: (response) => {
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 
   handleOnReset() {
