@@ -2,5 +2,6 @@ export const AppRoutes = {
   Home: '',
   Register: 'register',
   Login: 'login',
-  ForgotPassword: 'forgot-password'
+  ForgotPassword: 'forgot-password',
+  Chat: 'chat'
 };
