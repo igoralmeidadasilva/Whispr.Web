@@ -15,4 +15,16 @@ export class AuthService {
     const response = this.http.post(url, request);
     return response;
   }
+
+  logout(): Observable<any> {
+    const url = `${this.apiUrl}/logout`;
+    const response = this.http.post(url, {});
+    return response;
+  }
+
+  refresh(): Observable<any> {
+    const url = `${this.apiUrl}/refresh`;
+    const response = this.http.post(url, {});
+    return response;
+  }
 }

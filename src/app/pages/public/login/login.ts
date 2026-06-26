@@ -11,6 +11,9 @@ import { ProblemAlert } from "../../../components/features/problem-alert/problem
 import { EmailInput } from "../../../components/ui/inputs/email-input/email-input";
 import { LoginRequest } from '../../../core/models/auth.model';
 import { AuthService } from '../../../core/services/api/v1/authentications/auth.service';
+import { AuthManagerService } from '../../../core/services/auth-manager.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProblemDetails } from '../../../core/http/problem-details';
 
 interface LoginForm {
   email: FormControl<string | null>;
@@ -37,8 +40,12 @@ const passwordErrors: ReadonlyMap<string, string> = new Map([
 export class Login {
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
+  private authManagerService = inject(AuthManagerService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  private readonly alert = viewChild.required<ProblemAlert>('alert');
+  private alert = viewChild.required<ProblemAlert>('alert');
+  private returnUrl: string = '/';
 
   protected readonly appRoutes = AppRoutes;
   protected readonly emailErrors = emailErrors;
@@ -61,6 +68,7 @@ export class Login {
     }
 
     this.isLoading.set(true);
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 
     const request: LoginRequest = {
       email: this.email?.value ?? '',
@@ -70,8 +78,26 @@ export class Login {
     this.authService.login(request).subscribe({
       next: (response) => {
         this.isLoading.set(false);
+        this.authManagerService.markUserAsAuthenticated(response);
+
+        if (this.returnUrl === '/') {
+          this.router.navigate([AppRoutes.Chat]);
+          return;
+        }
+
+        this.router.navigateByUrl(this.returnUrl);
       },
-      error: () => {
+      error: (response) => {
+        const problem = response.error as ProblemDetails;
+
+        this.alert().show({
+          color: Colors.Danger,
+          problem: problem.detail ?? 'Erro inesperado',
+          errors: problem.errors 
+            ? new Map(Object.entries(problem.errors))
+            : undefined
+        });
+
         this.isLoading.set(false);
       }
     });
