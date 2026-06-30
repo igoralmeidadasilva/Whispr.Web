@@ -13,7 +13,10 @@
         }
     </label>
 
-    @if(!this.hideErrors()) {
-        <app-form-error label="Nome do usuário" [control]="this.control()" [errorsMap]="this.errorsMap()" />
+    @if (!this.errorsMap() || this.errorsMap()?.size === 0) {
+        @if(!this.hideErrors()) {
+            <app-form-error label="Nome do usuário" [control]="this.control()" [errorsMap]="this.errorsMap()!" />
+        }
     }
+    
 </div>

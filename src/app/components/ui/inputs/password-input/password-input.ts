@@ -15,8 +15,8 @@ export class PasswordInput {
   label = input.required<string>();
   controlName = input.required<string>();
   control = input.required<AbstractControl | null>();
-  errorsMap = input.required<ReadonlyMap<string, string>>();
 
+  errorsMap = input<ReadonlyMap<string, string>>();
   isRequired = input<boolean>(false);
   isDisabled = input<boolean>(false);
   hideErrors = input<boolean>(false);

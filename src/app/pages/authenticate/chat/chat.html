@@ -1,1 +1,35 @@
-<p>chat works!</p>
+<div class="container p-3">
+    <section class="justify-content-center bg-body-tertiary">
+         <div class="p-3">
+            <h1 class="display-6">Whispr :: Chat</h1>
+        </div>
+
+        <div class="row p-3">
+            <div class="col">
+                <span>Nome</span>
+                <p class="">{{ userState?.name }}</p>
+            </div>
+        </div>
+
+        <div class="row p-3 overflow-auto" style="height: 60vh;">
+            <div class="col">
+                @for (message of messages(); track message) {
+                    @if (message.UserName == userState?.name)
+                    {
+                        <p class="text-end">{{ message.Message }}</p>
+                    } @else {
+                        <p>{{ message.UserName }}: {{ message.Message }}</p>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="row p-3">
+            <form class="input-group input-group-sm" [formGroup]="sendMessageForm" (ngSubmit)="handleOnSubmit()" novalidate>
+                <span class="input-group-text">T</span>
+                <input type="text" formControlName="message" class="form-control" />
+                <button class="btn btn-outline-success" type="submit"> > </button>
+            </form>
+        </div>
+    </section>
+</div>
