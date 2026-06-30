@@ -18,8 +18,16 @@ export class AuthManagerService {
   private tokenStorageService = inject(TokenStorageService);
   private platformId = inject(PLATFORM_ID);
   private currentUser: UserState = this._anonymousUser;
-
+  
   getUserState(): UserState {
+    if (!isPlatformBrowser(this.platformId)) {
+      return this._anonymousUser;
+    }
+
+    return this.currentUser;
+  }
+
+  retriveAuthenticatedUser(): UserState {
     if (!isPlatformBrowser(this.platformId)) {
       return this._anonymousUser;
     }
@@ -54,11 +62,12 @@ export class AuthManagerService {
 
   private buildeUserStateFromToken(token: AuthToken): UserState {
     const decodedToken = jwtDecode<Record<string, any>>(token.token);
+
     return {
       isAuthenticated: true,
       id: decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid'] ?? null,
-      name: decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ?? null,
-      email: decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? null,
+      name: decodedToken['unique_name'] ?? null,
+      email: decodedToken['email'] ?? null,
     };
   }
 }
