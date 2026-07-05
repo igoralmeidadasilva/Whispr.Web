@@ -14,11 +14,11 @@
         <div class="row p-3 overflow-auto" style="height: 60vh;">
             <div class="col">
                 @for (message of messages(); track message) {
-                    @if (message.UserName == userState?.name)
+                    @if (message.userId == userState?.id)
                     {
-                        <p class="text-end">{{ message.Message }}</p>
+                        <p class="text-end">{{ message.content }}</p>
                     } @else {
-                        <p>{{ message.UserName }}: {{ message.Message }}</p>
+                        <p>{{ message.userName }}: {{ message.content! }}</p>
                     }
                 }
             </div>

@@ -1,11 +1,12 @@
 import { Component, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
-import { Message } from './chat.message';
 import { UserState } from '../../../core/models/auth.model';
 import { AuthManagerService } from '../../../core/services/auth-manager.service';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ApiRoutes } from '../../../core/constants/api-routes';
 import * as signalR from '@microsoft/signalr';
+import { CreateMessageRequest, MessageDto } from '../../../core/models/message.model';
+import { MessageService } from '../../../core/services/api/v1/messages/message.service';
 
 @Component({
   selector: 'app-chat',
@@ -15,13 +16,14 @@ import * as signalR from '@microsoft/signalr';
 })
 export class Chat implements OnInit, OnDestroy {
   private authManagerService: AuthManagerService = inject(AuthManagerService);
+  private messageService: MessageService = inject(MessageService);
   private platformId = inject(PLATFORM_ID);
   private formBuilder = inject(FormBuilder);
 
   private hubConnection: signalR.HubConnection | undefined;
 
   protected userState: UserState | undefined;
-  protected messages = signal<Message[]>([]);
+  protected messages = signal<MessageDto[]>([]);
 
   sendMessageForm: FormGroup = this.formBuilder.group({ message: [''], });
 
@@ -50,18 +52,29 @@ export class Chat implements OnInit, OnDestroy {
       .then(() => console.log('SignalR Connection started'))
       .catch(err => console.log('Error establishing SignalR connection: ' + err));
 
-    this.hubConnection.on('ReceiveMessage', (user: string, message: string) => {
-      this.messages.update(msgs => [...msgs, { UserName: user, Message: message }]);
+    this.hubConnection.on('ReceiveMessage', (message: MessageDto) => {
+      this.messages.update(msgs => [...msgs, message]);
     });
   }
 
   handleOnSubmit() {
-    const message =this.message!.value;
-    if (message && this.hubConnection) {
-      this.hubConnection.invoke('SendMessage', this.userState?.name, message)
-        .catch(err => console.error(err));
-      this.sendMessageForm.reset();
+    if (!this.sendMessageForm.valid) {
+      return;
     }
+    
+    const request: CreateMessageRequest = {
+      userId: this.userState?.id ?? '',
+      content: this.sendMessageForm.get('message')?.value ?? ''
+    };
+
+    this.messageService.create(request).subscribe({
+      next: () => {
+        this.sendMessageForm.reset();
+      },
+      error: (response) => {
+        console.error('Error trying send message', response);
+      }
+    });
   }
 
   disconnect() {
