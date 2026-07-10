@@ -14,21 +14,41 @@
         <div class="row p-3 overflow-auto" style="height: 60vh;">
             <div class="col">
                 @for (message of messages(); track message) {
-                    @if (message.userId == userState?.id)
-                    {
-                        <p class="text-end">{{ message.content }}</p>
-                    } @else {
-                        <p>{{ message.userName }}: {{ message.content! }}</p>
-                    }
+                    <app-message-bubble [message]="message" [userState]="userState!" />
                 }
             </div>
         </div>
 
+        <div class="row row-cols-6 p-3">
+            @if (selectedFiles.length > 0) {
+                @for(file of this.selectedFiles; track file) {
+                    <div class="col">
+                            <strong>{{ file.name }}</strong>
+                    </div>
+                }
+            }
+        </div>
+
         <div class="row p-3">
             <form class="input-group input-group-sm" [formGroup]="sendMessageForm" (ngSubmit)="handleOnSubmit()" novalidate>
-                <span class="input-group-text">T</span>
+                <input
+                    id="multiFileUpload"
+                    class="visually-hidden"
+                    type="file" 
+                    multiple 
+                    (change)="onFileSelected($event)"
+                />
+
+                <label 
+                    for="multiFileUpload" 
+                    class="btn btn-outline-success rounded-start-2"
+                >
+                    <i class="bi bi-paperclip fs-5"></i>
+                </label>
+
                 <input type="text" formControlName="message" class="form-control" />
-                <button class="btn btn-outline-success" type="submit"> > </button>
+
+                <button class="btn btn-outline-success" type="submit" [disabled]="isSubmiting()"> > </button>
             </form>
         </div>
     </section>

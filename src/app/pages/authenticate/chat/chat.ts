@@ -1,16 +1,17 @@
 import { Component, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { UserState } from '../../../core/models/auth.model';
 import { AuthManagerService } from '../../../core/services/auth-manager.service';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ApiRoutes } from '../../../core/constants/api-routes';
 import * as signalR from '@microsoft/signalr';
 import { CreateMessageRequest, MessageDto } from '../../../core/models/message.model';
 import { MessageService } from '../../../core/services/api/v1/messages/message.service';
+import { MessageBubble } from "../../../components/features/message-bubble/message-bubble";
 
 @Component({
   selector: 'app-chat',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule, MessageBubble],
   templateUrl: './chat.html',
   styleUrl: './chat.css',
 })
@@ -25,6 +26,9 @@ export class Chat implements OnInit, OnDestroy {
   protected userState: UserState | undefined;
   protected messages = signal<MessageDto[]>([]);
 
+  protected selectedFiles: File[] = [];
+  protected readonly isSubmiting = signal<boolean>(false);
+
   sendMessageForm: FormGroup = this.formBuilder.group({ message: [''], });
 
   get message() { return this.sendMessageForm.get('message'); }
@@ -32,6 +36,16 @@ export class Chat implements OnInit, OnDestroy {
   ngOnInit() {
     this.connect();
     this.userState = this.authManagerService.getUserState();
+
+    // this.messageService.getAll({ pageNumber: 1, pageSize: 12 })
+    //   .subscribe({
+    //     next: (response) => {
+    //       console.log(response)
+    //     },
+    //     error: (error) => {
+    //       console.log(error)
+    //     }
+    //   });
   }
 
   ngOnDestroy() {
@@ -61,20 +75,32 @@ export class Chat implements OnInit, OnDestroy {
     if (!this.sendMessageForm.valid) {
       return;
     }
-    
+
+    this.isSubmiting.set(true);
+
     const request: CreateMessageRequest = {
-      userId: this.userState?.id ?? '',
-      content: this.sendMessageForm.get('message')?.value ?? ''
+      content: this.sendMessageForm.get('message')?.value ?? '',
+      files: this.selectedFiles
     };
 
     this.messageService.create(request).subscribe({
       next: () => {
         this.sendMessageForm.reset();
+        this.selectedFiles = [];
+        this.isSubmiting.set(false);
       },
       error: (response) => {
         console.error('Error trying send message', response);
+        this.isSubmiting.set(false);
       }
     });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFiles = Array.from(input.files);
+    }
   }
 
   disconnect() {

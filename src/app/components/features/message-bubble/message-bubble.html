@@ -1,0 +1,43 @@
+<div class="d-flex mb-3" [ngClass]="message().userId === userState().id ? 'justify-content-end' : 'justify-content-start'">
+  
+  <div class="d-flex flex-column" style="max-width: 75%;">
+    
+    @if (message().userId !== userState().id) {
+      <span class="small text-muted fw-semibold mb-1 ms-2">
+        <i class="bi bi-person-circle me-1"></i>{{ message().user?.name }}
+      </span>
+    }
+
+    <div class="p-3 shadow-sm text-break text-start" 
+         [ngClass]="message().userId === userState().id 
+                    ? 'bg-success text-white rounded-4 rounded-top-end-0' 
+                    : 'bg-light text-dark border rounded-4 rounded-top-start-0'">
+      
+      @if (message().attachments && message().attachments!.length > 0) {
+        <div class="row g-2 mb-2">
+          @for (attachment of message().attachments; track attachment) {
+            <div class="col-12">
+              <img [src]="attachment.sasUri" 
+                   class="img-fluid rounded-3 border border-opacity-10 shadow-sm custom-chat-img" 
+                   alt="Anexo" />
+            </div>
+          }
+        </div>
+      }
+
+      @if (message().content) {
+        <p class="mb-0 small-text fs-6 lh-sm">{{ message().content }}</p>
+      }
+    </div>
+
+    <div class="mt-1 small text-muted d-flex align-items-center gap-1"
+         [ngClass]="message().userId === userState().id ? 'justify-content-end me-1' : 'justify-content-start ms-1'">
+      <span style="font-size: 0.75rem;">12:34</span>
+      
+      @if (message().userId === userState().id) {
+        <i class="bi bi-check2-all text-primary fs-6"></i>
+      }
+    </div>
+
+  </div>
+</div>

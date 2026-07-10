@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiRoutes } from '../../../../constants/api-routes';
 import { Observable } from 'rxjs';
-import { CreateMessageRequest } from '../../../../models/message.model';
-import { HttpClient } from '@angular/common/http';
+import { CreateMessageRequest, GetAllMessagesRequest } from '../../../../models/message.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -10,8 +10,28 @@ import { HttpClient } from '@angular/common/http';
 export class MessageService {
   private http = inject(HttpClient);
 
-  create(request: CreateMessageRequest): Observable<any> {
-    const response = this.http.post(ApiRoutes.V1.Messages.Create, request);
+  getAll(request: GetAllMessagesRequest): Observable<any> {
+    const params = new HttpParams({
+      fromObject: {
+        pageNumber: request.pageNumber.toString(),
+        pageSize: request.pageSize.toString(), 
+      }
+    });
+    const response = this.http.get(ApiRoutes.V1.Messages.GetAll, { params });
     return response;
+  }
+
+  create(request: CreateMessageRequest): Observable<any> {
+    const formData = new FormData();
+
+    formData.append('content', request.content);
+
+    if (request.files && request.files.length > 0) {
+      request.files.forEach(file => {
+        formData.append('attachments', file, file.name);
+      });
+    }
+
+    return this.http.post(ApiRoutes.V1.Messages.Create, formData);
   }
 }

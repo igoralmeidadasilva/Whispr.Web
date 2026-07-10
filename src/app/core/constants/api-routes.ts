@@ -21,6 +21,7 @@ export const ApiRoutes = {
 
         Messages: {
             Create: baseUrl + '/api/v1/messages',
+            GetAll: baseUrl + '/api/v1/messages',
         }
     }
 };
