@@ -4,6 +4,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ModalFooter } from './modal-footer';
 import { ModalComponent } from '../modal-component/modal-component';
 
+vi.mock('bootstrap', () => {
+  return {
+    Modal: vi.fn().mockImplementation(function () {
+      return { show: vi.fn(), hide: vi.fn(), dispose: vi.fn() };
+    }),
+  };
+});
+
 @Component({
   standalone: true,
   imports: [ModalComponent, ModalFooter],
