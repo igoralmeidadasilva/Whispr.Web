@@ -11,9 +11,17 @@
             </div>
         </div>
 
-        <div class="row p-3 overflow-auto" style="height: 60vh;">
+        <div class="row p-3 overflow-auto" #scrollContainer (scroll)="onScroll()" style="height: 60vh;">
             <div class="col">
-                @for (message of messages(); track message) {
+                @if (isLoadingHistory()) {
+                    <div class="d-flex justify-content-center p-2">
+                        <div class="spinner-border spinner-border-sm text-success" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                    </div>
+                }
+
+                @for (message of messages(); track message.id) {
                     <app-message-bubble [message]="message" [userState]="userState!" (onAttachmentClick)="handleOnAttachmentClick($event)" />
                 }
             </div>
@@ -23,7 +31,7 @@
             @if (selectedFiles.length > 0) {
                 @for(file of this.selectedFiles; track file) {
                     <div class="col">
-                            <strong>{{ file.name }}</strong>
+                        <strong>{{ file.name }}</strong>
                     </div>
                 }
             }

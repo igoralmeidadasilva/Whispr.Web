@@ -20,3 +20,8 @@ export interface GetAllMessagesRequest {
   pageNumber: number,
   pageSize: number
 }
+
+export interface GetMessagesChatHistoryRequest {
+  pageNumber: number,
+  pageSize: number
+}

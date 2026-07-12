@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiRoutes } from '../../../../constants/api-routes';
 import { Observable } from 'rxjs';
-import { CreateMessageRequest, GetAllMessagesRequest } from '../../../../models/message.model';
+import { CreateMessageRequest, GetAllMessagesRequest, GetMessagesChatHistoryRequest, MessageDto } from '../../../../models/message.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { PagedModel } from '../../../../models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,20 @@ export class MessageService {
     });
     const response = this.http.get(ApiRoutes.V1.Messages.GetAll, { params });
     return response;
+  }
+
+  getChatHistory(request: GetMessagesChatHistoryRequest): Observable<any> {
+    const params = new HttpParams({
+      fromObject: {
+        pageNumber: request.pageNumber.toString(),
+        pageSize: request.pageSize.toString(), 
+      }
+    });
+    return this.http.get<PagedModel<MessageDto>>(ApiRoutes.V1.Messages.GetChatHistory, { params });
+  }
+
+  getPage(url: string): Observable<PagedModel<MessageDto>> {
+    return this.http.get<PagedModel<MessageDto>>(url);
   }
 
   create(request: CreateMessageRequest): Observable<any> {

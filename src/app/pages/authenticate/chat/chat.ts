@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, PLATFORM_ID, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, ElementRef, inject, Injector, OnDestroy, OnInit, PLATFORM_ID, signal, viewChild } from '@angular/core';
 import { UserState } from '../../../core/models/auth.model';
 import { AuthManagerService } from '../../../core/services/auth-manager.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -13,6 +13,8 @@ import { ModalHeader } from "../../../components/ui/modals/modal-header/modal-he
 import { ModalBody } from "../../../components/ui/modals/modal-body/modal-body";
 import { MessageAttachmentDto } from '../../../core/models/message-attachment.model';
 import { Sizes } from '../../../core/enums/sizes';
+import { ProblemDetails } from '../../../core/http/problem-details';
+import { PagedModel } from '../../../core/models/page.model';
 
 @Component({
   selector: 'app-chat',
@@ -25,6 +27,7 @@ export class Chat implements OnInit, OnDestroy {
   private messageService: MessageService = inject(MessageService);
   private platformId = inject(PLATFORM_ID);
   private formBuilder = inject(FormBuilder);
+  private injector = inject(Injector);
 
   private hubConnection: signalR.HubConnection | undefined;
 
@@ -45,6 +48,14 @@ export class Chat implements OnInit, OnDestroy {
 
   protected readonly sizes = Sizes;
 
+  protected readonly isLoadingHistory = signal<boolean>(false);
+  protected readonly hasMoreHistory = signal<boolean>(true);
+  private nextLink = signal<string | null>(null);
+  private readonly PAGE_SIZE = 12;
+  private readonly SCROLL_THRESHOLD = 100;
+
+  protected readonly scrollContainer = viewChild<ElementRef<HTMLDivElement>>('scrollContainer');
+
   sendMessageForm: FormGroup = this.formBuilder.group({ message: [''], });
 
   get message() { return this.sendMessageForm.get('message'); }
@@ -52,20 +63,87 @@ export class Chat implements OnInit, OnDestroy {
   ngOnInit() {
     this.connect();
     this.userState = this.authManagerService.getUserState();
-
-    // this.messageService.getAll({ pageNumber: 1, pageSize: 12 })
-    //   .subscribe({
-    //     next: (response) => {
-    //       console.log(response)
-    //     },
-    //     error: (error) => {
-    //       console.log(error)
-    //     }
-    //   });
+    this.loadInitialHistory();
   }
 
   ngOnDestroy() {
     this.disconnect();
+  }
+
+  private loadInitialHistory(): void {
+    this.isLoadingHistory.set(true);
+
+    this.messageService.getChatHistory({ pageNumber: 1, pageSize: this.PAGE_SIZE })
+      .subscribe({
+        next: (response) => {
+          const ordered = [...response.items].reverse();
+
+          this.messages.set(ordered);
+          this.nextLink.set(response.next);
+          this.hasMoreHistory.set(!!response.next);
+          this.isLoadingHistory.set(false);
+
+          afterNextRender(() => this.scrollToBottom(), { injector: this.injector });
+        },
+        error: (error) => {
+          console.error('Erro ao carregar histórico de mensagens', error);
+          this.isLoadingHistory.set(false);
+        }
+      });
+  }
+
+  protected onScroll(): void {
+    const container = this.scrollContainer()?.nativeElement;
+    if (!container) return;
+
+    if (
+      container.scrollTop <= this.SCROLL_THRESHOLD &&
+      this.hasMoreHistory() &&
+      !this.isLoadingHistory()
+    ) {
+      this.loadMoreHistory();
+    }
+  }
+
+  private loadMoreHistory(): void {
+    const link = this.nextLink();
+    if (!link) return;
+
+    this.isLoadingHistory.set(true);
+
+    const container = this.scrollContainer()?.nativeElement;
+    const previousScrollHeight = container?.scrollHeight ?? 0;
+    const previousScrollTop = container?.scrollTop ?? 0;
+
+    this.messageService.getPage(link).subscribe({
+      next: (response: PagedModel<MessageDto>) => {
+        const ordered = [...response.items].reverse();
+
+        this.messages.update(msgs => [...ordered, ...msgs]);
+        this.nextLink.set(response.next);
+        this.hasMoreHistory.set(!!response.next);
+        this.isLoadingHistory.set(false);
+
+        afterNextRender(() => {
+          const newContainer = this.scrollContainer()?.nativeElement;
+          if (!newContainer) return;
+
+          const newScrollHeight = newContainer.scrollHeight;
+          newContainer.scrollTop = newScrollHeight - previousScrollHeight + previousScrollTop;
+        }, { injector: this.injector });
+      },
+      error: (error: ProblemDetails) => {
+        console.error('Erro ao carregar mensagens antigas', error);
+        this.isLoadingHistory.set(false);
+      }
+    });
+  }
+
+  private scrollToBottom(): void {
+    const container = this.scrollContainer()?.nativeElement;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }
 
   private connect() {
