@@ -1,22 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { Component } from '@angular/core';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ModalBody } from './modal-body';
+import { ModalComponent } from '../modal-component/modal-component';
+
+@Component({
+  standalone: true,
+  imports: [ModalComponent, ModalBody],
+  template: `
+    <app-modal-component>
+      <app-modal-body cssClass="minha-classe" />
+    </app-modal-component>
+  `,
+})
+class HostTestComponent {}
 
 describe('ModalBody', () => {
-  let component: ModalBody;
-  let fixture: ComponentFixture<ModalBody>;
+  let fixture: ComponentFixture<HostTestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalBody],
+      imports: [HostTestComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ModalBody);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture = TestBed.createComponent(HostTestComponent);
+    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const body = fixture.debugElement.query(
+      (de) => de.componentInstance instanceof ModalBody
+    );
+    expect(body).toBeTruthy();
   });
 });

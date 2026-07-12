@@ -11,8 +11,6 @@ import {
   computed,
 } from '@angular/core';
 
-import { Modal } from 'bootstrap';
-
 @Component({
   selector: 'app-modal-component',
   imports: [],

@@ -1,22 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { Component } from '@angular/core';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ModalFooter } from './modal-footer';
+import { ModalComponent } from '../modal-component/modal-component';
+
+@Component({
+  standalone: true,
+  imports: [ModalComponent, ModalFooter],
+  template: `
+    <app-modal-component>
+      <app-modal-footer />
+    </app-modal-component>
+  `,
+})
+class HostTestComponent {}
 
 describe('ModalFooter', () => {
-  let component: ModalFooter;
-  let fixture: ComponentFixture<ModalFooter>;
+  let fixture: ComponentFixture<HostTestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalFooter],
+      imports: [HostTestComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ModalFooter);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture = TestBed.createComponent(HostTestComponent);
+    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const footer = fixture.debugElement.query(
+      (de) => de.componentInstance instanceof ModalFooter
+    );
+    expect(footer).toBeTruthy();
   });
 });
