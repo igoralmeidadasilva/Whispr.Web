@@ -26,6 +26,6 @@ export const routes: Routes = [
         path: AppRoutes.Chat,
         component: Chat,
         title: 'Wispher :: Chat',
-        canActivate: [authGuard] 
+        canActivate: [authGuard]
     }
 ];

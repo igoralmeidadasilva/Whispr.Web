@@ -2,7 +2,7 @@ import { HttpInterceptorFn } from "@angular/common/http";
 import { catchError, tap, throwError } from "rxjs";
 
 export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
-    console.info(`[HTTP] Before request → ${req.method} ${req.url}`);
+  console.info(`[HTTP] Before request → ${req.method} ${req.url}`);
 
   return next(req).pipe(
     tap(() => {

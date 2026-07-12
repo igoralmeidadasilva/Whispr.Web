@@ -1,0 +1,11 @@
+<div [class]="headerClasses()">
+    <ng-content>
+        <h1 class="modal-title fs-5">{{ title() }}</h1>
+    </ng-content>
+    
+    <button 
+        type="button" 
+        [class]="btnClasses()" 
+        (click)="handleClickBtnClose()">
+    </button>
+</div>

@@ -24,29 +24,17 @@ export class AuthManagerService {
       return this._anonymousUser;
     }
 
-    return this.currentUser;
-  }
-
-  retriveAuthenticatedUser(): UserState {
-    if (!isPlatformBrowser(this.platformId)) {
-      return this._anonymousUser;
+    if (this.currentUser.isAuthenticated) {
+      return this.currentUser;
     }
 
     const token = this.tokenStorageService.getAccessToken();
 
     if (!token) {
-      this.markUserAsUnauthenticated();
-      return this.currentUser;
-    };
-
-    const isDateExpired = new Date() >= new Date(token.tokenExpirationAtUtc);
-
-    if (isDateExpired) {
-      this.markUserAsUnauthenticated();
-      return this.currentUser;
+      return this._anonymousUser;
     }
 
-    this.markUserAsAuthenticated(token);
+    this.currentUser = this.buildeUserStateFromToken(token);
     return this.currentUser;
   }
 

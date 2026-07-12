@@ -1,0 +1,11 @@
+.custom-chat-img {
+  max-height: 250px;
+  width: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.custom-chat-img:hover {
+  opacity: 0.9;
+}
