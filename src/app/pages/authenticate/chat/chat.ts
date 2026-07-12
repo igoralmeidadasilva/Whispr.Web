@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, PLATFORM_ID, signal, viewChild } from '@angular/core';
 import { UserState } from '../../../core/models/auth.model';
 import { AuthManagerService } from '../../../core/services/auth-manager.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -8,10 +8,15 @@ import * as signalR from '@microsoft/signalr';
 import { CreateMessageRequest, MessageDto } from '../../../core/models/message.model';
 import { MessageService } from '../../../core/services/api/v1/messages/message.service';
 import { MessageBubble } from "../../../components/features/message-bubble/message-bubble";
+import { ModalComponent } from "../../../components/ui/modals/modal-component/modal-component";
+import { ModalHeader } from "../../../components/ui/modals/modal-header/modal-header";
+import { ModalBody } from "../../../components/ui/modals/modal-body/modal-body";
+import { MessageAttachmentDto } from '../../../core/models/message-attachment.model';
+import { Sizes } from '../../../core/enums/sizes';
 
 @Component({
   selector: 'app-chat',
-  imports: [ReactiveFormsModule, CommonModule, MessageBubble],
+  imports: [ReactiveFormsModule, CommonModule, MessageBubble, ModalComponent, ModalHeader, ModalBody],
   templateUrl: './chat.html',
   styleUrl: './chat.css',
 })
@@ -28,6 +33,17 @@ export class Chat implements OnInit, OnDestroy {
 
   protected selectedFiles: File[] = [];
   protected readonly isSubmiting = signal<boolean>(false);
+
+  protected readonly attachmentModal = viewChild.required<ModalComponent>('attachmentModal');
+  protected readonly selectedAttachment = signal<MessageAttachmentDto>({
+    id: '',
+    messageId: '',
+    fileName: '',
+    contentType: '',
+    sasUri: ''
+  });
+
+  protected readonly sizes = Sizes;
 
   sendMessageForm: FormGroup = this.formBuilder.group({ message: [''], });
 
@@ -101,6 +117,11 @@ export class Chat implements OnInit, OnDestroy {
     if (input.files && input.files.length > 0) {
       this.selectedFiles = Array.from(input.files);
     }
+  }
+
+  handleOnAttachmentClick(attachment: MessageAttachmentDto) {
+    this.selectedAttachment.set(attachment);
+    this.attachmentModal().showAsync();
   }
 
   disconnect() {

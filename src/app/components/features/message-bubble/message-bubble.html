@@ -17,7 +17,8 @@
         <div class="row g-2 mb-2">
           @for (attachment of message().attachments; track attachment) {
             <div class="col-12">
-              <img [src]="attachment.sasUri" 
+              <img [src]="attachment.sasUri"
+                   (click)="onClick(attachment)"
                    class="img-fluid rounded-3 border border-opacity-10 shadow-sm custom-chat-img" 
                    alt="Anexo" />
             </div>

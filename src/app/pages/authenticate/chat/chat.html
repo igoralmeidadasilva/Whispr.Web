@@ -14,7 +14,7 @@
         <div class="row p-3 overflow-auto" style="height: 60vh;">
             <div class="col">
                 @for (message of messages(); track message) {
-                    <app-message-bubble [message]="message" [userState]="userState!" />
+                    <app-message-bubble [message]="message" [userState]="userState!" (onAttachmentClick)="handleOnAttachmentClick($event)" />
                 }
             </div>
         </div>
@@ -53,3 +53,12 @@
         </div>
     </section>
 </div>
+
+<app-modal-component #attachmentModal [size]="this.sizes.Xl"> 
+    <app-modal-header [title]="this.selectedAttachment().fileName"/>
+
+    <app-modal-body cssClass="d-flex justify-content-center align-items-center">
+        <img [src]="this.selectedAttachment().sasUri">
+    </app-modal-body>
+
+</app-modal-component>

@@ -1,0 +1,15 @@
+<div [class]="cssClass()">
+    <ng-content>
+        @if (showCancelButton()) {
+            <app-button [color]="cancelColor()" (click)="handleClickBtnClose()">
+            {{ cancelLabel() }}
+            </app-button>
+        }
+
+        @if (showConfirmButton()) {
+            <app-button [color]="confirmColor()" (click)="handleClickBtnConfirm()">
+            {{ confirmLabel() }}
+            </app-button>
+        }
+    </ng-content>
+</div>

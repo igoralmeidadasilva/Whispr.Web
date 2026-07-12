@@ -1,0 +1,13 @@
+<div #modalRef
+     [id]="id()" 
+     [class]="buildCssClass()"
+     tabindex="-1"
+     [attr.data-bs-backdrop]="isStatic() ? 'static' : 'true'"
+     [attr.data-bs-keyboard]="isStatic() ? 'false' : 'true'">
+    
+    <div [class]="'modal-dialog modal-dialog-scrollable' + modalSizeClass()">
+        <div class="modal-content">
+            <ng-content></ng-content>
+        </div>
+    </div>
+</div>
