@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RecordButton } from "../../../components/ui/buttons/record-button/record-button";
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [RecordButton],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

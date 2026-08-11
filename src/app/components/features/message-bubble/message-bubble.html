@@ -1,6 +1,6 @@
 <div class="d-flex mb-3" [ngClass]="message().userId === userState().id ? 'justify-content-end' : 'justify-content-start'">
   
-  <div class="d-flex flex-column" style="max-width: 75%;">
+  <div class="d-flex flex-column">
     
     @if (message().userId !== userState().id) {
       <span class="small text-muted fw-semibold mb-1 ms-2">
@@ -14,13 +14,33 @@
                     : 'bg-light text-dark border rounded-4 rounded-top-start-0'">
       
       @if (message().attachments && message().attachments!.length > 0) {
-        <div class="row g-2 mb-2">
-          @for (attachment of message().attachments; track attachment) {
-            <div class="col-12">
-              <img [src]="attachment.sasUri"
-                   (click)="onClick(attachment)"
-                   class="img-fluid rounded-3 border border-opacity-10 shadow-sm custom-chat-img" 
-                   alt="Anexo" />
+        <div class="row g-2 mb-2 mx-0">
+          @for (attachment of message().attachments; track attachment.id) {
+            <div class="col-12 px-0">
+              
+              @if (isImage(attachment.contentType)) {
+                <img [src]="attachment.sasUri"
+                     (click)="onClick(attachment)"
+                     class="img-fluid rounded-3 border border-opacity-10 shadow-sm custom-chat-img cursor-pointer" />
+              }
+
+              @else if (isAudio(attachment.contentType)) {
+                <div class="my-1">
+                  <app-audio-player 
+                    [src]="attachment.sasUri" 
+                    [type]="attachment.contentType">
+                  </app-audio-player>
+                </div>
+              }
+
+              @else {
+                <div class="d-flex align-items-center gap-2 p-2 rounded bg-body-tertiary text-dark cursor-pointer" 
+                     (click)="onClick(attachment)">
+                  <i class="bi bi-paperclip fs-5"></i>
+                  <span class="text-truncate small">{{ attachment.fileName }}</span>
+                </div>
+              }
+
             </div>
           }
         </div>

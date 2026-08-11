@@ -1,0 +1,10 @@
+<button [id]="id()"
+        [class]="buildCssClass()"
+        (click)="handleOnClick($event)" >
+
+    @if (this.isRecording()) {
+        <i class="bi bi-mic-mute"></i>
+    } @else {
+        <i class="bi bi-mic"></i>
+    }
+</button>
